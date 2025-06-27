@@ -1,42 +1,196 @@
+<!DOCTYPE html>
 <html>
   <head>
-    <link rel="stylesheet" href="assets/css/style.css" />
-    <link rel="stylesheet" href="assets/css/topbar.css" />
-
-    <!-- <link rel="stylesheet" href="assets/css/no-topbar.css"> -->
-    <script defer src="assets/js/renderer.js"></script>
     <meta charset="UTF-8" />
     <title>Github</title>
+
     <meta
-      http-equiv="Content-Security-Policy"
-      content="script-src 'self' 'unsafe-inline';"
-    />
+  http-equiv="Content-Security-Policy"
+  content="default-src * 'self' data: blob: filesystem:; script-src * 'unsafe-inline' 'unsafe-eval'; style-src * 'unsafe-inline'; img-src * data: blob:;">
+    
+    <link rel="stylesheet" href="assets/css/style.css" />
+
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        width: 100%;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+
+      #controls {
+        display: flex;
+        align-items: center;
+        padding: 4px;
+        gap: 5px;
+        background: #f3f3f3;
+        border-bottom: 1px solid #ccc;
+        flex-shrink: 0;
+      }
+
+      #address-bar {
+        flex-grow: 1;
+        padding: 5px;
+        font-size: 14px;
+      }
+
+      #tabs {
+        display: flex;
+        gap: 5px;
+        padding: 4px;
+        background: #eee;
+        border-bottom: 1px solid #ccc;
+        flex-shrink: 0;
+      }
+
+      #tabs button {
+        padding: 5px 10px;
+        border: none;
+        background: #ddd;
+        cursor: pointer;
+      }
+
+      #tabs button.active {
+        font-weight: bold;
+        background: #ccc;
+      }
+
+      #webview-container {
+        position: relative;
+        flex-grow: 1;
+        width: 100%;
+        overflow: hidden;
+      }
+
+      webview {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: none;
+        border: none;
+      }
+
+      webview.active {
+        display: block;
+      }
+    </style>
   </head>
   <body>
-    <!-- Topbar -->
     <div id="controls">
-      <button id="home" title="Go Home">Home</button>
-      <button id="print_button">Print</button>
+      <button id="back">⬅️</button>
+      <button id="forward">➡️</button>
+      <button id="refresh">🔄</button>
+      <button id="home">🏠</button>
+      <input id="address-bar" type="text" placeholder="Enter URL..." />
+      <button id="go">Go</button>
+      <button id="new-tab">➕</button>
     </div>
-    <!-- End topbar -->
 
-    <!-- Webview -->
+    <div id="tabs"></div>
+    <div id="webview-container"></div>
 
-    <webview
-      autosize="on"
-      src="https://www.github.com"
-      id="webview"
-      data-home="https://github.com"
-    ></webview>
+    <script>
+      const addressBar = document.getElementById("address-bar");
+      const goButton = document.getElementById("go");
+      const backButton = document.getElementById("back");
+      const forwardButton = document.getElementById("forward");
+      const refreshButton = document.getElementById("refresh");
+      const homeButton = document.getElementById("home");
+      const newTabButton = document.getElementById("new-tab");
+      const tabsContainer = document.getElementById("tabs");
+      const webviewContainer = document.getElementById("webview-container");
 
-    <!-- HTML -->
-    <!--
-    <h1>Hello world!</h1>
-    <p>
-      Lorem ipsum dolor sit amet consectetur adipisicing elit. Modi, voluptatum
-      sint ullam minima molestias nam id autem perferendis! Cumque veritatis
-      sunt dolor quidem cum? Natus dolore ipsum illum numquam molestiae?
-    </p>
-    -->
+      let tabCount = 0;
+      let activeTabId = null;
+      const tabs = {};
+
+      function createTab(url) {
+        const tabId = `tab-${++tabCount}`;
+
+        const webview = document.createElement("webview");
+        webview.setAttribute("src", url);
+        webview.setAttribute("id", tabId);
+        webview.setAttribute("allowpopups", "");
+        webview.classList.add("tab-webview");
+        webviewContainer.appendChild(webview);
+
+        const tabButton = document.createElement("button");
+        tabButton.innerText = `Tab ${tabCount}`;
+        tabButton.onclick = () => switchToTab(tabId);
+        tabsContainer.appendChild(tabButton);
+
+        tabs[tabId] = {
+          id: tabId,
+          webview,
+          tabButton,
+        };
+
+        switchToTab(tabId);
+      }
+
+      function switchToTab(tabId) {
+        if (activeTabId && tabs[activeTabId]) {
+          tabs[activeTabId].webview.classList.remove("active");
+          tabs[activeTabId].tabButton.classList.remove("active");
+        }
+
+        activeTabId = tabId;
+        const currentTab = tabs[tabId];
+        currentTab.webview.classList.add("active");
+        currentTab.tabButton.classList.add("active");
+        addressBar.value = currentTab.webview.getAttribute("src") || "";
+      }
+
+      backButton.onclick = () => {
+        const webview = tabs[activeTabId]?.webview;
+        if (webview?.canGoBack()) webview.goBack();
+      };
+
+      forwardButton.onclick = () => {
+        const webview = tabs[activeTabId]?.webview;
+        if (webview?.canGoForward()) webview.goForward();
+      };
+
+      refreshButton.onclick = () => {
+        const webview = tabs[activeTabId]?.webview;
+        webview?.reload();
+      };
+
+      homeButton.onclick = () => {
+        const webview = tabs[activeTabId]?.webview;
+        if (webview) webview.setAttribute("src", "https://github.com");
+      };
+
+      goButton.onclick = () => {
+        const url = addressBar.value.trim();
+        if (!url) return;
+        const formattedUrl = /^https?:\/\//.test(url) ? url : "https://" + url;
+        const webview = tabs[activeTabId]?.webview;
+        if (webview) webview.setAttribute("src", formattedUrl);
+      };
+
+      newTabButton.onclick = () => {
+        createTab("https://www.w3schools.com");
+      };
+
+      // Ensure webview resizes with window
+      window.addEventListener("resize", () => {
+        const webviews = document.querySelectorAll("webview");
+        webviews.forEach(wv => {
+          wv.style.height = `${webviewContainer.clientHeight}px`;
+        });
+      });
+
+      // Create default tab at start
+      window.onload = () => {
+        createTab("https://github.com");
+      };
+    </script>
   </body>
 </html>
