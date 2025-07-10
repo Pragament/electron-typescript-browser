@@ -1,96 +1,142 @@
-/* === RESET + LAYOUT === */
 html, body {
   margin: 0;
   padding: 0;
   height: 100%;
   width: 100%;
   overflow: hidden;
-  display: flex;
-  flex-direction: column;
+  font-family: sans-serif;
 }
 
-/* === Top Control Bar === */
+#app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+}
+
 #controls {
   display: flex;
   align-items: center;
   gap: 6px;
   padding: 10px;
+  background: #f3f3f3;
   border-bottom: 1px solid #ccc;
-  background-color: #f3f3f3;
   flex-shrink: 0;
 }
 
-/* Control buttons */
-#controls button {
-  padding: 5px 10px;
-  font-size: 14px;
-  border: 1px solid #aaa;
-  background-color: #fff;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-#controls button:hover {
-  background-color: #e0e0e0;
-}
-
-/* Address bar input */
 #address-bar {
   flex: 1;
   padding: 5px 10px;
+  font-size: 14px;
   border: 1px solid #aaa;
   border-radius: 4px;
-  font-size: 14px;
 }
 
-/* === Tab Bar === */
 #tabs {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 5px 10px;
+  gap: 6px;
+  padding: 6px 10px;
   background-color: #eaeaea;
   border-bottom: 1px solid #ccc;
   flex-shrink: 0;
+  overflow-x: auto;
 }
 
 #tabs button {
-  padding: 5px 10px;
-  border: 1px solid #aaa;
+  padding: 6px 12px;
   border-radius: 4px;
-  background-color: #f0f0f0;
+  background: #eee;
+  border: 1px solid #aaa;
   cursor: pointer;
-}
-
-#tabs button:hover {
-  background-color: #d8d8d8;
 }
 
 #tabs button.active {
   font-weight: bold;
-  background-color: #d0d0d0;
+  background-color: #ccc;
 }
 
-/* === Webview Container === */
 #webview-container {
-  flex-grow: 1;
+  flex: 1;
   width: 100%;
   position: relative;
-  overflow: auto; /* Changed from hidden to allow scrolling if needed */
-  min-height: 0;
+  background: white;
+  overflow: hidden;
+  display: flex;
 }
 
-/* Webview styling */
-#webview-container webview {
+.placeholder {
+  text-align: center;
+  color: #aaa;
+  width: 100%;
+  align-self: center;
+}
+
+webview {
   position: absolute;
   top: 0;
   left: 0;
+  height: 100%;
   width: 100%;
-  height: 100%; /* Will be set by TS */
   border: none;
   display: none;
+  visibility: hidden;
+  pointer-events: none;
 }
 
-#webview-container webview.active {
+webview.active {
   display: block;
+  visibility: visible;
+  pointer-events: auto;
+  z-index: 1;
+}
+
+#record-toggle {
+  padding: 6px 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+#settings-button {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+#settings-form {
+  display: none;
+  padding: 10px;
+  background: #f9f9f9;
+  border-top: 1px solid #ccc;
+}
+
+#settings-form.active {
+  display: block;
+}
+
+#settings-form label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+#settings-form input[type="text"],
+#settings-form input[type="number"] {
+  flex: 1;
+  padding: 5px;
+  border: 1px solid #aaa;
+  border-radius: 4px;
+}
+
+#settings-form button {
+  padding: 5px 8px;
+  border-radius: 4px;
+  background: #eee;
+  border: 1px solid #aaa;
+  cursor: pointer;
 }

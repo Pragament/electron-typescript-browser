@@ -9,7 +9,7 @@ export function createBrowserWindow(app: Electron.App): BrowserWindow {
       nodeIntegration: false,
       contextIsolation: true,
       webviewTag: true,
-      preload: path.join(__dirname, "preload.js"),
+      preload: path.join(__dirname, "../build/preload.js"),
     },
   });
 }
