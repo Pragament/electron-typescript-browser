@@ -42,7 +42,7 @@ app.whenReady().then(async () => {
   }
 
   // Resolve the preload script path
-  const preloadPath = path.join(__dirname, "../build/preload.js");
+  const preloadPath = path.join(app.getAppPath(), "build/preload.js");
   console.log("Preload path:", preloadPath);
 
   // Create the main window
@@ -65,7 +65,7 @@ app.whenReady().then(async () => {
   });
 
   // Load HTML
-  mainWindow.loadFile("index.html").then(() => {
+  mainWindow.loadFile(path.join(app.getAppPath(), "index.html")).then(() => {
     console.log("Main window HTML loaded");
   }).catch((err) => {
     console.error("Failed to load HTML:", err);
