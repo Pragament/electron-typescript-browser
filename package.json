@@ -7,9 +7,11 @@
   "scripts": {
     "start": "electron .",
     "build": "tsc",
-    "package-mac": "npx electron-packager . --overwrite --platform=darwin --arch=arm64 --icon=assets/icons/mac/icon.icns --prune=true --out=release-builds",
-    "package-win": "npx electron-packager . --overwrite --asar=true --platform=win32 --arch=ia32 --icon=assets/icons/win/icon.ico --prune=true --out=release-builds --version-string.CompanyName=CE --version-string.FileDescription=CE --version-string.ProductName=\"Electron Webview\"",
-    "package-linux": "npx electron-packager . --overwrite --platform=linux --arch=x64 --icon=assets/icons/png/1024x1024.png --prune=true --out=release-builds",
+    "package-win": "tsc && npx electron-packager . \"Educational Browser\" --overwrite --asar --platform=win32 --arch=x64 --icon=assets/icons/win/icon.ico --prune=true --out=release-builds --version-string.CompanyName=\"Educational Browser\" --version-string.FileDescription=\"Educational Browser for Students\" --version-string.ProductName=\"Educational Browser\" && node scripts/copy-lab-scripts.js",
+    "zip-lab": "powershell -Command \"Compress-Archive -Path 'release-builds/Educational Browser-win32-x64/*' -DestinationPath 'release-builds/Educational-Browser-Lab-Setup.zip' -Force\"",
+    "package-win-32": "tsc && npx electron-packager . \"Educational Browser\" --overwrite --asar --platform=win32 --arch=ia32 --icon=assets/icons/win/icon.ico --prune=true --out=release-builds --version-string.CompanyName=\"Educational Browser\" --version-string.FileDescription=\"Educational Browser for Students\" --version-string.ProductName=\"Educational Browser\"",
+    "package-mac": "tsc && npx electron-packager . --overwrite --platform=darwin --arch=arm64 --icon=assets/icons/mac/icon.icns --prune=true --out=release-builds",
+    "package-linux": "tsc && npx electron-packager . --overwrite --platform=linux --arch=x64 --icon=assets/icons/png/1024x1024.png --prune=true --out=release-builds",
     "create-installer-mac": "npx electron-installer-dmg ./release-builds/Electron\\ webview-darwin-arm64/Electron\\ webview.app electron-webview --out=release-builds --overwrite --icon=assets/icons/mac/icon.icns"
   },
   "repository": "https://github.com/cba85/electron-webview",
