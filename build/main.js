@@ -61,7 +61,7 @@ electron_1.app.whenReady().then(async () => {
         console.log("ℹ️ Firebase status on startup:", firebaseInitResult.message);
     }
     // Resolve the preload script path
-    const preloadPath = path.join(__dirname, "../build/preload.js");
+    const preloadPath = path.join(electron_1.app.getAppPath(), "build/preload.js");
     console.log("Preload path:", preloadPath);
     // Create the main window
     mainWindow = new electron_1.BrowserWindow({
@@ -81,7 +81,7 @@ electron_1.app.whenReady().then(async () => {
         webviewTag: true,
     });
     // Load HTML
-    mainWindow.loadFile("index.html").then(() => {
+    mainWindow.loadFile(path.join(electron_1.app.getAppPath(), "index.html")).then(() => {
         console.log("Main window HTML loaded");
     }).catch((err) => {
         console.error("Failed to load HTML:", err);

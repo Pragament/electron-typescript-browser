@@ -959,9 +959,7 @@ window.addEventListener("DOMContentLoaded", () => {
         settingsLeaveClassBtn.addEventListener("click", () => {
             const confirmLeave = confirm("Are you sure you want to leave the active class session? You will be prompted to enter a class code.");
             if (confirmLeave) {
-                localStorage.removeItem("active_class_code");
-                localStorage.removeItem("active_class_name");
-                localStorage.removeItem("active_class_whitelist");
+                clearClassSession();
                 settingsModal.style.display = "none";
                 location.reload();
             }
@@ -1145,32 +1143,27 @@ window.addEventListener("DOMContentLoaded", () => {
         const homeUrl = getHomeUrl();
         addNewTab(homeUrl);
     }
-    // Check saved session on startup and re-verify with Firebase
-    const savedClassCode = localStorage.getItem("active_class_code");
-    if (savedClassCode) {
-        electron_1.ipcRenderer.invoke("firebase-verify-class-code", { classCode: savedClassCode })
-            .then(res => {
-            if (res.success && res.found) {
-                activateClassSession(savedClassCode.toUpperCase(), res.classData?.name || savedClassCode.toUpperCase(), res.classData?.whitelistedWebsites);
-            }
-            else {
-                localStorage.removeItem("active_class_code");
-                localStorage.removeItem("active_class_name");
-                localStorage.removeItem("active_class_whitelist");
-                if (classGateModal)
-                    classGateModal.style.display = "flex";
-                setGateStatus("❌ Saved Class Code is no longer active in Firebase. Please re-enter a valid Class Code.", "error");
-            }
-        })
-            .catch(() => {
-            if (classGateModal)
-                classGateModal.style.display = "flex";
-        });
+    // --- Session Management ---
+    function clearClassSession() {
+        localStorage.removeItem("active_class_code");
+        localStorage.removeItem("active_class_name");
+        localStorage.removeItem("active_class_whitelist");
+        localStorage.removeItem("previous_class_code");
+        localStorage.removeItem("previous_class_name");
+        localStorage.removeItem("previous_class_whitelist");
     }
-    else {
-        updatePreviousClassBox();
-        if (classGateModal)
-            classGateModal.style.display = "flex";
+    // Always require fresh class code login when browser starts up
+    clearClassSession();
+    updatePreviousClassBox();
+    if (classGateModal)
+        classGateModal.style.display = "flex";
+    if (classGateClose)
+        classGateClose.style.display = "none";
+    if (classGateCancelBtn)
+        classGateCancelBtn.style.display = "none";
+    if (classCodeInput) {
+        classCodeInput.value = "";
+        setTimeout(() => classCodeInput.focus(), 150);
     }
     async function submitClassCode(codeToVerify) {
         const code = (codeToVerify || classCodeInput?.value || "").trim();
@@ -1291,6 +1284,7 @@ window.addEventListener("DOMContentLoaded", () => {
     });
     // --- Close Browser & Exit Handlers ---
     async function closeBrowser() {
+        clearClassSession();
         try {
             await electron_1.ipcRenderer.invoke("close-app");
         }
@@ -1299,6 +1293,13 @@ window.addEventListener("DOMContentLoaded", () => {
             window.close();
         }
     }
+    // Clear active class code session whenever the browser window closes or unloads
+    window.addEventListener("beforeunload", () => {
+        clearClassSession();
+    });
+    window.addEventListener("unload", () => {
+        clearClassSession();
+    });
     const closeBrowserBtn = document.getElementById("close-browser-button");
     if (closeBrowserBtn) {
         closeBrowserBtn.addEventListener("click", () => {
