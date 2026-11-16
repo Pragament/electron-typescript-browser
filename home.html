@@ -626,6 +626,85 @@
     <div class="dashboard-columns">
       <!-- Left Column: Main Learning Hub -->
       <div class="main-stage">
+        <!-- Section 0: Centralized School Management System Applications -->
+        <div class="section-card" style="border: 2px solid #bfdbfe; background: linear-gradient(180deg, #f8faff 0%, #ffffff 100%); margin-bottom: 20px;">
+          <div class="section-header">
+            <div class="section-title-group">
+              <span class="section-title" style="color: #1e40af;">
+                🏫 Central School Ecosystem Applications
+              </span>
+              <span class="section-badge" style="background: #dbeafe; color: #1e40af; border-color: #93c5fd;">Single Student UUID</span>
+            </div>
+            <div id="electron-student-badge">
+              <!-- Rendered via SchoolAuth -->
+            </div>
+          </div>
+
+          <p class="section-desc">Unified access to all connected school applications. Authenticated once with shared lab PIN or student password.</p>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; margin-top: 14px;">
+            <!-- App 1: Student Hub -->
+            <a href="../student-dashboard.html" class="site-card" style="border-left: 4px solid #6366f1;">
+              <div class="site-info-wrapper">
+                <div class="site-logo" style="background: #eef2ff; font-size: 22px; display: flex; align-items: center; justify-content: center;">🎓</div>
+                <div class="site-details">
+                  <div class="site-heading">Student Portal Hub</div>
+                  <div class="site-sublink">My Profile, Scores &amp; History</div>
+                </div>
+              </div>
+              <div class="status-tag status-allowed" style="background:#eef2ff; color:#4f46e5; border-color:#c7d2fe;">Launch Hub</div>
+            </a>
+
+            <!-- App 2: Intranet Quiz -->
+            <a href="../intranet-quiz/index.html" class="site-card" style="border-left: 4px solid #3b82f6;">
+              <div class="site-info-wrapper">
+                <div class="site-logo" style="background: #eff6ff; font-size: 22px; display: flex; align-items: center; justify-content: center;">📝</div>
+                <div class="site-details">
+                  <div class="site-heading">Intranet Quiz</div>
+                  <div class="site-sublink">Tests, Quizzes &amp; Live Timer</div>
+                </div>
+              </div>
+              <div class="status-tag status-allowed">Start Quiz</div>
+            </a>
+
+            <!-- App 3: Intranet Course Studio -->
+            <a href="../intranet-course-studio/index.html" class="site-card" style="border-left: 4px solid #06b6d4;">
+              <div class="site-info-wrapper">
+                <div class="site-logo" style="background: #ecfeff; font-size: 22px; display: flex; align-items: center; justify-content: center;">📘</div>
+                <div class="site-details">
+                  <div class="site-heading">Course Studio</div>
+                  <div class="site-sublink">Multimedia Lessons &amp; Progress</div>
+                </div>
+              </div>
+              <div class="status-tag status-allowed" style="background:#ecfeff; color:#0891b2; border-color:#a5f3fc;">Open Studio</div>
+            </a>
+
+            <!-- App 4: Library Tracker -->
+            <a href="../library-tracker/index.html" class="site-card" style="border-left: 4px solid #10b981;">
+              <div class="site-info-wrapper">
+                <div class="site-logo" style="background: #ecfdf5; font-size: 22px; display: flex; align-items: center; justify-content: center;">📚</div>
+                <div class="site-details">
+                  <div class="site-heading">Library Tracker</div>
+                  <div class="site-sublink">Book Catalog &amp; Lending</div>
+                </div>
+              </div>
+              <div class="status-tag status-allowed" style="background:#ecfdf5; color:#059669; border-color:#a7f3d0;">Browse Books</div>
+            </a>
+
+            <!-- App 5: Teacher Diary -->
+            <a href="../teacher-diary/dashboard.html" class="site-card" style="border-left: 4px solid #f59e0b;">
+              <div class="site-info-wrapper">
+                <div class="site-logo" style="background: #fffbeb; font-size: 22px; display: flex; align-items: center; justify-content: center;">👨‍🏫</div>
+                <div class="site-details">
+                  <div class="site-heading">Teacher Diary &amp; Lab</div>
+                  <div class="site-sublink">Lab PINs &amp; Student Manager</div>
+                </div>
+              </div>
+              <div class="status-tag status-allowed" style="background:#fffbeb; color:#d97706; border-color:#fde68a;">Teacher Desk</div>
+            </a>
+          </div>
+        </div>
+
         <!-- Section 1: Approved Whitelisted Websites -->
         <div class="section-card">
           <div class="section-header">
@@ -760,6 +839,8 @@
     </div>
   </div>
 
+  <!-- Central School Auth Library -->
+  <script src="assets/school-auth.js"></script>
   <script>
 
     const studyTips = [
@@ -831,7 +912,7 @@
     }
 
     function isUrlWhitelisted(targetUrl) {
-      if (!targetUrl || targetUrl === 'home.html' || targetUrl.includes('home.html') || targetUrl.startsWith('file:') || targetUrl === 'about:blank') {
+      if (!targetUrl || targetUrl === 'home.html' || targetUrl.includes('home.html') || targetUrl.startsWith('file:') || targetUrl.startsWith('../') || targetUrl === 'about:blank' || targetUrl.includes('localhost') || targetUrl.includes('127.0.0.1') || targetUrl.includes('student-dashboard') || targetUrl.includes('intranet') || targetUrl.includes('library-tracker') || targetUrl.includes('teacher-diary')) {
         return true;
       }
 
@@ -1146,6 +1227,9 @@
         if (qList !== null) localStorage.setItem('active_class_whitelist', qList);
       }
       renderWhitelistedWebsites();
+      if (typeof SchoolAuth !== 'undefined') {
+        SchoolAuth.renderHeaderBadge('electron-student-badge');
+      }
     }
 
     window.setHomePortalData = function(code, name, websites) {
